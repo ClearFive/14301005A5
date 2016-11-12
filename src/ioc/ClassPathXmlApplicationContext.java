@@ -20,10 +20,6 @@ public class ClassPathXmlApplicationContext implements ApplicationContext
 			IllegalArgumentException, InvocationTargetException
 	{
 		SAXBuilder sb = new SAXBuilder();
-		Object ob = Class.forName("test.car").newInstance();
-		beans.put("car", ob);
-		Object ob1 = Class.forName("test.office").newInstance();
-		beans.put("office", ob1);
 		for(int n=0;n<locations.length;n++){
 		// 构造文档对象
 		Document doc = sb.build(ClassPathXmlApplicationContext.class
@@ -53,14 +49,17 @@ public class ClassPathXmlApplicationContext implements ApplicationContext
 				String ref = propertyElement.getAttributeValue("ref");
 				String value = propertyElement.getAttributeValue("value");
 				
-				
-				
 				if(value!=null){
 					String methodName = "set" + name.substring(0, 1).toUpperCase()
 							+ name.substring(1);
 					Method m =o.getClass().getMethod(methodName, value.getClass());
 					m.invoke(o, value);
 				}else{
+					
+					if(!beans.containsKey(name)){
+						Object ob0 = Class.forName("test."+ref).newInstance();
+						beans.put(name, ob0);	
+					}
 				// 从bean.xml中根据ref取到类的对象
 				Object beanObj = this.getBean(ref);
 				String methodName = "set" + name.substring(0, 1).toUpperCase()
@@ -72,6 +71,7 @@ public class ClassPathXmlApplicationContext implements ApplicationContext
 				}
 				
 			}
+			
 		}
 	}
 	
